@@ -1,8 +1,8 @@
 {
   "name": "adw",
   "displayName": "ADW — AI Development Workflow",
-  "version": "1.1.1",
-  "description": "Drive a task, plan, or handoff through Plan → Scout → Build → Test → Engineer Review → Ship, auto-looping on failure. Project-agnostic — reads each project's own CLAUDE.md to learn how it builds.",
+  "version": "1.2.0",
+  "description": "Give it a task; the Planner drafts a plan you approve, then it drives Build → Test → Engineer Review → Ship, auto-looping on failure. Project-agnostic — reads each project's own CLAUDE.md to learn how it builds.",
   "author": { "name": "el-varquez" },
   "homepage": "https://github.com/el-varquez/adw",
   "repository": "https://github.com/el-varquez/adw",
