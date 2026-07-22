@@ -56,6 +56,8 @@ Build↔Test auto-loops at most 3 rounds (--max-rounds N), then escalates to you
   checklist. Approval means QA + engineer signed off — that authorizes Ship.
 - **Persistent Build.** The Build agent is continued across retries, so it remembers prior
   attempts. Both fail loop-backs feed it. Cap: 3 rounds, then it escalates to you.
+- **Nothing commits until Ship.** Build only edits the working tree — it never commits, branches,
+  or pushes. All changes are committed once, at Ship, after Engineer + QA approval.
 
 ## Stages
 

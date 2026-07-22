@@ -390,7 +390,7 @@
           <div class="glyph">🔨</div>
           <div>
             <div class="n-label">Build <span class="role-pill">the only writer</span></div>
-            <p class="n-desc">Implements the plan's steps, then compiles. Persistent across retries — it keeps memory of what it already tried, so it doesn't thrash. Won't-compile fails loop back to itself.</p>
+            <p class="n-desc">Implements the plan's steps, then compiles. Leaves all edits <strong>uncommitted</strong> in the working tree — nothing is committed until Ship. Persistent across retries — it keeps memory of what it already tried, so it doesn't thrash. Won't-compile fails loop back to itself.</p>
             <div class="chips"><span class="chip chip--ok">PASS → Test</span><span class="chip chip--bad">FAIL → self</span></div>
           </div>
         </div>

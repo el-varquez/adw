@@ -45,19 +45,22 @@ loop:
 - ESCALATE = STOP, write a run log (§5) with the full attempt history, hand it to the Engineer.
 
 ## 3. Engineer Review  (the one mandatory human gate — QA tests here)
-- Show a compact summary: files changed (`git -C <repo> diff --stat` per touched repo), Build
-  result, Test result, and the **manual-verify checklist** (if any) — this checklist is what QA
-  runs at this gate.
+- Show a compact summary: the files Build changed — these are **uncommitted** working-tree edits,
+  so use `git -C <repo> status --short` + `git -C <repo> diff --stat` per touched repo — plus the
+  Build result, Test result, and the **manual-verify checklist** (if any), which is what QA runs here.
 - Ask the Engineer: approve (with QA sign-off), or reject with a reason.
   - **Reject(reason)** → `SendMessage(build, "<reason>")`, `round += 1`, re-enter the Build↔Test
     loop (subject to the cap).
   - **Approve** → Ship (§4). Approval = QA + Engineer satisfied, and authorizes commit → PR → merge.
 
 ## 4. Ship  (only after Review approval = QA + Engineer sign-off)
+**This is the ONLY place anything is committed.** Build left every edit uncommitted in the working
+tree; nothing has been committed until now.
 - Read the git rules from the project's CLAUDE.md (and the user's global `~/.claude/CLAUDE.md`
   if present). For EACH repo the change touched:
   - create a feature branch off its default branch (e.g. `feature/<ticket>-<slug>`),
-  - commit, referencing the ticket key,
+  - stage the accumulated changes and make a **single commit** (or a small logical set),
+    referencing the ticket key,
   - push the branch, open a PR (`gh pr create`), and merge it (`gh pr merge`) into the default branch.
 - **Follow the git conventions in that CLAUDE.md** — branch naming, commit-message style, and any
   co-author/trailer policy. Impose none of your own.
