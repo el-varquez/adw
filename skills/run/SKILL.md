@@ -1,31 +1,31 @@
 ---
-name: adw
-description: Drive a task through the ADW pipeline — Plan → Build → Test → Engineer Review → Ship, auto-looping on failure. Use when the user runs /adw:adw <task>, or asks to plan/build/ship a task through the ADW workflow.
+name: run
+description: Relay — drive a task through the pipeline: Plan → Build → Test → Engineer Review → Ship, auto-looping on failure. Use when the user runs /relay:run <task>, or asks to plan/build/ship a task through Relay.
 ---
 
-# ADW — AI Development Workflow (orchestrator)
+# Relay — agent-driven development workflow (orchestrator)
 
-You are the **orchestrator** of the ADW. You are the Engineer's own session: you COORDINATE
+You are the **orchestrator** of Relay. You are the Engineer's own session: you COORDINATE
 (dispatch subagents, hold the human gates) — you do NOT do the file-level work yourself.
 Design reference: this plugin's `README.md` (`${CLAUDE_PLUGIN_ROOT}/README.md`).
 
-Dispatch subagents with the **Agent/Task** tool (`subagent_type: "adw:adw-plan" | "adw:adw-build"
-| "adw:adw-test"`; the Planner dispatches `adw:adw-scout` itself). Continue the persistent Build
+Dispatch subagents with the **Agent/Task** tool (`subagent_type: "relay:plan" | "relay:build"
+| "relay:test"`; the Planner dispatches `relay:scout` itself). Continue the persistent Build
 agent with **SendMessage** (load its schema via ToolSearch first if needed). Read each subagent's
 final `VERDICT:` line to branch.
 
 ## 0. Parse the invocation
 - Args: `<task / problem> [--max-rounds N]` (default `--max-rounds 3`).
-- The arg is a **task to implement** — ADW always plans it first (§1). If the task should build on
-  an existing plan/spec/doc, mention that file's path in the task and the Planner will read it.
+- The arg is a **task to implement** — Relay always plans it first (§1). If the task should build
+  on an existing plan/spec/doc, mention that file's path in the task and the Planner will read it.
 
 ## 1. Plan
 - **Detect planning skills:** scan your available skills for plan-generating ones (e.g.
   `superpowers:writing-plans`, `to-prd`). Collect their names (may be none).
-- Dispatch `adw:adw-plan` with the task + the detected skill names. The Planner recons via its
-  Scout sub-agent (`adw:adw-scout`) and returns a plan.
+- Dispatch `relay:plan` with the task + the detected skill names. The Planner recons via its
+  Scout sub-agent (`relay:scout`) and returns a plan.
   - `VERDICT: PLAN BLOCKED` → STOP, show the blockers, ask the Engineer to clarify. Do not proceed.
-  - `VERDICT: PLAN READY` → save the plan to `./.adw/plans/<YYYY-MM-DD>-<slug>.md`.
+  - `VERDICT: PLAN READY` → save the plan to `./.relay/plans/<YYYY-MM-DD>-<slug>.md`.
 - **⏸ PLAN-REVIEW gate (human):** show the Engineer the saved plan. Ask: approve, edit, or reject.
   - **Edit** → apply their edits to the plan file (or re-dispatch the Planner with the feedback).
   - **Reject(reason)** → re-dispatch the Planner with the reason.
@@ -35,14 +35,14 @@ final `VERDICT:` line to branch.
 ## 2. Build ↔ Test loop  (cap = max-rounds)
 ```
 round = 1
-build = Agent(subagent_type="adw:adw-build", prompt = plan + context pack)   # capture handle
+build = Agent(subagent_type="relay:build", prompt = plan + context pack)   # capture handle
 loop:
     if build verdict == FAIL:                 # didn't compile
         if round >= max: -> ESCALATE
         round += 1
         SendMessage(build, "Build failed to compile:\n<output>\nFix and rebuild.")
         continue                              # re-read build's new verdict
-    test = Agent(subagent_type="adw:adw-test", prompt = plan + test/lint commands)   # fresh
+    test = Agent(subagent_type="relay:test", prompt = plan + test/lint commands)   # fresh
     if test verdict == PASS: break            # -> Engineer Review
     if round >= max: -> ESCALATE
     round += 1
@@ -74,6 +74,6 @@ tree; nothing has been committed until now.
 - Finish by reporting: branch name, commit ref, PR link, and merge status per repo.
 
 ## 5. Run log (every run)
-- Write a short log: default `./.adw/runs/<YYYY-MM-DD>-<slug>.md` (or where the project's CLAUDE.md
+- Write a short log: default `./.relay/runs/<YYYY-MM-DD>-<slug>.md` (or where the project's CLAUDE.md
   says). Include: the task, plan reference, ticket type, per-round Build/Test verdicts, final
   outcome (shipped / escalated), branch + commit refs.

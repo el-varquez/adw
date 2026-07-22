@@ -1,15 +1,15 @@
 # Detecting build / test / lint commands for any project
 
-The ADW is project-agnostic. This is the procedure the Scout agent follows to learn how the
-CURRENT project builds, tests, and lints. Resolve in priority order and STOP at the first
-source that gives a confident answer; fall through only when it doesn't.
+Relay is project-agnostic. This is the procedure the Scout agent follows to learn how the CURRENT
+project builds, tests, and lints. Resolve in priority order and STOP at the first source that gives
+a confident answer; fall through only when it doesn't.
 
 ## Priority order
 
 1. **`./CLAUDE.md` or `./AGENTS.md`** (primary). Well-run repos document exact commands. Read
    them and extract the build / test / lint invocations verbatim, including any required
    environment setup and platform/config flags.
-2. **The plan/handoff's own "Verify" / "Build" section.** If the plan names the commands to run
+2. **Any plan or spec doc's "Verify" / "Build" section.** If such a doc names the commands to run
    (or says tests are deferred / manual), that governs.
 3. **Ecosystem heuristics** (below), inferred from files present in the repo.
 4. **Unresolved → report it.** If none of the above yields a confident command set, say so in

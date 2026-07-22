@@ -1,11 +1,11 @@
 {
-  "name": "adw",
+  "name": "relay",
   "owner": { "name": "el-varquez" },
   "plugins": [
     {
-      "name": "adw",
+      "name": "relay",
       "source": "./",
-      "description": "AI Development Workflow — Scout → Build → Test → Engineer Review → Ship."
+      "description": "Relay — an agent-driven development workflow: Plan → Build → Test → Engineer Review → Ship."
     }
   ]
 }

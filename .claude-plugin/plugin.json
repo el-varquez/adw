@@ -1,11 +1,11 @@
 {
-  "name": "adw",
-  "displayName": "ADW — AI Development Workflow",
-  "version": "1.2.0",
-  "description": "Give it a task; the Planner drafts a plan you approve, then it drives Build → Test → Engineer Review → Ship, auto-looping on failure. Project-agnostic — reads each project's own CLAUDE.md to learn how it builds.",
+  "name": "relay",
+  "displayName": "Relay",
+  "version": "2.0.0",
+  "description": "Give it a task; a relay of agents plans it (you approve), then builds, tests, and ships — Plan → Build → Test → Engineer Review → Ship, auto-looping on failure. Project-agnostic — reads each project's own CLAUDE.md.",
   "author": { "name": "el-varquez" },
-  "homepage": "https://github.com/el-varquez/adw",
-  "repository": "https://github.com/el-varquez/adw",
+  "homepage": "https://github.com/el-varquez/relay",
+  "repository": "https://github.com/el-varquez/relay",
   "license": "MIT",
-  "keywords": ["workflow", "pipeline", "agents", "orchestration", "build", "test"]
+  "keywords": ["workflow", "pipeline", "agents", "orchestration", "relay", "build", "test"]
 }
