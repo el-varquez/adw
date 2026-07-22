@@ -15,25 +15,27 @@ project builds and tests.
 Then, from inside any project:
 
 ```
-/adw:adw <path-to-plan-or-handoff>            # e.g. /adw:adw path/to/your-plan.md
-/adw:adw <path-to-plan-or-handoff> --max-rounds 5
+/adw:adw "<a task or problem>"            # NEW: ADW plans it for you first
+/adw:adw <path-to-plan-or-handoff>        # or hand it an existing plan
+/adw:adw <task-or-plan> --max-rounds 5
 ```
 
-No plan yet? Brainstorm and write one first, then feed it in.
+No plan yet? Just pass the task — the Planner drafts one and you approve it before any building.
 
 ## The flow
 
 ```
-Engineer: /adw:adw <plan|handoff>
+Engineer: /adw:adw <task | plan | handoff>
     │
-    ▼
-🔍 SCOUT   read-only · discover build/test/lint cmds + verify plan vs code
-    │  PLAN BROKEN → stop + run log        PLAN OK (+ context pack)
-    ▼
-🔨 BUILD   the only writer · implement plan + compile     ◀─┐  fail: loop back
-    │  PASS                                                  │  (same agent, keeps memory)
-    ▼                                                        │
-✅ TEST    read-only · run plan's Verify (tests, else lint) ─┘
+    │  task?  → 🧭 PLANNER  recons via nested 🔍 Scout → drafts a plan
+    │             → ⏸ PLAN REVIEW  (you approve / edit the plan) ──┐
+    │  plan?  → 🔍 SCOUT  read-only · discover cmds + verify plan ──┤
+    │             PLAN BROKEN → stop + run log                      │
+    ▼                                                               ▼
+🔨 BUILD   the only writer · implement + compile · leaves edits uncommitted   ◀─┐  fail: loop back
+    │  PASS                                                                      │  (same agent)
+    ▼                                                                            │
+✅ TEST    read-only · run plan's Verify (tests, else compile+lint) ────────────┘
     │  PASS (+ manual-verify checklist)
     ▼
 ⏸  ENGINEER REVIEW + QA   QA runs the checklist here · approve = QA + Eng sign-off
@@ -46,6 +48,9 @@ Build↔Test auto-loops at most 3 rounds (--max-rounds N), then escalates to you
 
 ## How it works
 
+- **Task or plan.** Give ADW a finished plan, or just a task — the **Planner** agent recons the
+  code (via a nested Scout) and drafts a grounded plan for you to approve before any building
+  starts. It uses `superpowers:writing-plans` if installed, otherwise plans plainly.
 - **Project-agnostic.** Nothing is hardcoded. The orchestrator (your Claude Code session)
   reads *this* project's `CLAUDE.md` for build/test/lint commands and git conventions, then
   delegates to subagents.
@@ -63,6 +68,7 @@ Build↔Test auto-loops at most 3 rounds (--max-rounds N), then escalates to you
 
 | Stage | Writes? | Job | Passes when |
 |-------|---------|-----|-------------|
+| Plan *(task mode)* | no | Planner turns a task into a grounded plan, reconning via Scout | you approve the plan |
 | Scout | no | discover build/test/lint cmds; verify plan vs code; emit context pack | plan actionable → `PLAN OK` |
 | Build | yes | implement the plan, then compile | clean compile → `PASS` |
 | Test  | no | run the plan's Verify (tests, else compile + lint) | every gate green → `PASS` |
