@@ -17,7 +17,6 @@ Then, from inside any project:
 
 ```
 /relay:run "<a task or problem>"
-/relay:run "<a task or problem>" --max-rounds 5
 ```
 
 Just describe the task — the Planner recons the code, drafts a plan, and you approve it before any building. (Want it to build on an existing plan or spec? Mention that file's path in the task.)
@@ -41,7 +40,7 @@ flowchart LR
     SH --> DONE(["🎉 Merged"])
 ```
 
-*Renders as a diagram in Obsidian, GitHub, and most Markdown viewers. Scout (`relay:scout`) is the Planner's read-only recon sub-agent. Build↔Test loops at most 3 rounds (`--max-rounds N`), then escalates to you.*
+*Renders as a diagram in Obsidian, GitHub, and most Markdown viewers. Scout (`relay:scout`) is the Planner's read-only recon sub-agent. Build↔Test loops until Test passes — it only pauses for you if Build genuinely stalls.*
 
 <details>
 <summary>Plain-text version</summary>
@@ -51,7 +50,7 @@ flowchart LR
 - **Build** (`relay:build`) implements + compiles → **Test** (`relay:test`) runs tests + lint.
 - Test fail → back to Build. Test pass → **Engineer Review + QA** (you). Reject → back to Build.
 - Approve → **Ship** (orchestrator): commit → push → PR → merge.
-- Build↔Test loops at most 3 rounds (`--max-rounds N`), then escalates to you.
+- Build↔Test loops until Test passes (it only pauses for you if Build genuinely stalls).
 
 </details>
 
@@ -69,7 +68,8 @@ flowchart LR
 - **QA is part of Review.** The Engineer Review gate is where QA runs the manual-verify
   checklist. Approval means QA + engineer signed off — that authorizes Ship.
 - **Persistent Build.** The Build agent is continued across retries, so it remembers prior
-  attempts. Both fail loop-backs feed it. Cap: 3 rounds, then it escalates to you.
+  attempts. Both fail loop-backs feed it. It loops Build↔Test until green — pausing only if it
+  genuinely stalls.
 - **Nothing commits until Ship.** Build only edits the working tree — it never commits, branches,
   or pushes. All changes are committed once, at Ship, after Engineer + QA approval.
 

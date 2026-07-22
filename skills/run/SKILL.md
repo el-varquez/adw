@@ -15,7 +15,7 @@ agent with **SendMessage** (load its schema via ToolSearch first if needed). Rea
 final `VERDICT:` line to branch.
 
 ## 0. Parse the invocation
-- Args: `<task / problem> [--max-rounds N]` (default `--max-rounds 3`).
+- Args: `<task / problem>`.
 - The arg is a **task to implement** — Relay always plans it first (§1). If the task should build
   on an existing plan/spec/doc, mention that file's path in the task and the Planner will read it.
 
@@ -32,23 +32,21 @@ final `VERDICT:` line to branch.
   - **Approve** → continue to §2 (Build↔Test). The Planner's context pack (build/test/lint commands)
     carries into §2.
 
-## 2. Build ↔ Test loop  (cap = max-rounds)
+## 2. Build ↔ Test loop  (runs until Test passes)
 ```
-round = 1
 build = Agent(subagent_type="relay:build", prompt = plan + context pack)   # capture handle
-loop:
-    if build verdict == FAIL:                 # didn't compile
-        if round >= max: -> ESCALATE
-        round += 1
+loop:                                          # no round cap — keep passing the baton
+    if build verdict == FAIL:                  # didn't compile
         SendMessage(build, "Build failed to compile:\n<output>\nFix and rebuild.")
-        continue                              # re-read build's new verdict
+        continue                               # re-read build's new verdict
     test = Agent(subagent_type="relay:test", prompt = plan + test/lint commands)   # fresh
-    if test verdict == PASS: break            # -> Engineer Review
-    if round >= max: -> ESCALATE
-    round += 1
-    SendMessage(build, "Tests failed:\n<output>\nFix and rebuild.")
+    if test verdict == PASS: break             # -> Engineer Review
+    SendMessage(build, "Tests failed:\n<output>\nFix and rebuild.")   # loop until PASS
 ```
-- ESCALATE = STOP, write a run log (§5) with the full attempt history, hand it to the Engineer.
+- **No round cap.** The relay keeps looping Build ↔ Test until Test is green — that's the point.
+- **Safety valve (not a cap):** only pause and hand off to the Engineer if Build genuinely stalls —
+  the *same* failure repeats with no progress, or Build finds the **plan itself** is wrong/unworkable.
+  Write a run log (§5) and escalate. This trips only on a real dead-end; normal runs loop freely.
 
 ## 3. Engineer Review + QA  (mandatory human gate — QA tests here)
 - Show a compact summary: the files Build changed — these are **uncommitted** working-tree edits,
