@@ -1,0 +1,9 @@
+# Everything in this repo is owned by the maintainer.
+# GitHub auto-requests review from owners listed here on every pull request.
+#
+# NOTE: the "require review from Code Owners" rule is deliberately OFF in the
+# branch ruleset while this repo has a single collaborator — GitHub does not
+# allow you to approve your own PR, so turning it on now would block every PR
+# you open. Turn it on once there is a second collaborator.
+
+* @el-varquez
