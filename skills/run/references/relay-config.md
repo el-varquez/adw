@@ -103,13 +103,23 @@ Only treat a command as a genuine gate failure when it *ran* and came back red.
 
 ## Poly-repo
 
-Three rules. Projects that omit `repos` never encounter any of them.
+Projects that omit `repos` never encounter any of this.
 
 1. **Absent `repos`** → a single repo at the working directory; top-level `commands` apply.
 2. **Per-repo `commands` override top-level.** Top-level is the default; a repo declares only what
    differs.
-3. **`dependsOn` gives a topological order**, used twice — build order during Build, and merge
-   order at Ship.
+3. **`dependsOn` gives a topological order**, used for build order during Build and merge order at
+   Ship.
+4. **Identical commands run ONCE per pass, not once per repo.** If several repos resolve to the same
+   command string for a gate, deduplicate it. Some projects have one solution-level build that
+   covers several repos at once (a Delphi group project, a Gradle multi-project, a workspace
+   build) — running it once per repo is pure waste, and its output is the same either way.
+5. **A gate whose key a repo has no command for is SKIPPED for that repo — not failed.** If `lint`
+   is required and one repo declares no lint command, that repo simply has no lint gate. Report it
+   as skipped; do not fail the run and do not invent a command.
+6. **`dependsOn` does not imply each repo builds alone.** It states ordering. When repos share a
+   build command (rule 4), that command owns its own internal ordering and `dependsOn` only governs
+   merge order at Ship.
 
 Build creates the **same branch name in every repo it touches**, so the set is correlatable.
 Ship opens one PR per touched repo and walks them in dependency order.

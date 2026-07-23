@@ -31,7 +31,10 @@ wasted work.
    headers, and any out-of-scope lists in the plan.
 3. Run the **build command from the context pack** for every affected target. Run the **setup
    command first** if one is declared (env scripts, version managers). In a poly-repo project use
-   each repo's own command when it declares an override, and build in the declared dependency order.
+   each repo's own command when it declares an override, and build in the declared dependency order
+   — but **deduplicate: if several repos resolve to the same command, run it once.** A single
+   solution-level build (a Delphi group project, a workspace build) already covers its repos and
+   owns their internal ordering; re-running it per repo is wasted time.
    - If CLAUDE.md flags a fragile build path (e.g. a project may mark one build target as
      fragile while its sub-targets build fine), build the reliable target(s) and SURFACE the
      fragile one in your verdict — do not thrash on it.

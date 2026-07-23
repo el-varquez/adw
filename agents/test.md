@@ -23,6 +23,10 @@ when a gate failure genuinely can't be understood from the diff.
 - **`gates.required`** — a red one is a FAIL.
 - **`gates.advisory`** — run it and report it, but a red one does **not** fail the run. Say clearly
   that it was advisory.
+- **A repo with no command for a required gate key skips that gate** — report it as skipped, never
+  as a failure, and never substitute a command of your own.
+- **Deduplicate identical commands.** If several repos resolve to the same command string, run it
+  once and report it once; some projects build several repos from one solution-level command.
 
 **Otherwise**, read the plan's **Verify** section and run what it names:
 - **Plan names automated tests** → run them. PASS = green, FAIL = red.
