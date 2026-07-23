@@ -1,7 +1,11 @@
 # `relay.config.json` — the project config
 
-An **optional** per-project file at the repo root. It declares the facts Relay would otherwise
-have to discover or infer on every run. A project with no config behaves exactly as Relay always
+An **optional** per-project file. It declares the facts Relay would otherwise have to discover or
+infer on every run.
+
+**Where it lives:** the repo root for a single repo; for a poly-repo solution, the directory that
+*contains* the repos. Relay looks in the working directory and then walks **up** to find it, so a
+run started from inside one repo of a solution still picks up the shared config. A project with no config behaves exactly as Relay always
 has — the config is an override layer, never a requirement.
 
 ## The boundary rule

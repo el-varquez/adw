@@ -20,7 +20,9 @@ final `VERDICT:` line to branch.
   If it should build on an existing plan/spec/doc, mention that file's path in the task and the
   Planner will read it.
 
-- **Load `./relay.config.json`** if it exists (schema:
+- **Load `relay.config.json`** — look in the working directory, then **walk up** until you find one
+  (stop at the filesystem root, or after ~3 levels). Poly-repo solutions keep it in the directory
+  that *contains* the repos, so a run started from inside one repo must still find it. Schema:
   `${CLAUDE_PLUGIN_ROOT}/skills/run/references/relay-config.md`). It declares build/test/lint
   commands, gates, branch conventions, the Ship stopping point, and repo layout. **Every field is
   optional and there may be no file at all** — absent config means Relay behaves exactly as it does
